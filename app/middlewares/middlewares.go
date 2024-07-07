@@ -10,40 +10,53 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func JWTMiddleware() echo.MiddlewareFunc {
+type MiddlewaresInterface interface {
+	JWTMiddleware() echo.MiddlewareFunc
+	CreateToken(userId int) (string, error)
+	ExtractTokenUserId(e echo.Context) int
+}
+
+type middlewares struct{}
+
+func NewMiddlewares() MiddlewaresInterface {
+	return &middlewares{}
+}
+
+func (m *middlewares) JWTMiddleware() echo.MiddlewareFunc {
 	return echojwt.WithConfig(echojwt.Config{
-		SigningKey:    []byte(config.JWT_SECRET),
-		SigningMethod: "HS256",
+		SigningKey: []byte(config.JWT_SECRET),
 	})
 }
 
-// Generate token jwt
-func CreateToken(userId int) (string, error) {
-	claims := jwt.MapClaims{}
-	claims["authorized"] = true
-	claims["userId"] = userId
-	claims["exp"] = time.Now().Add(time.Hour * 1).Unix() //Token expires after 1 hour
+func (m *middlewares) CreateToken(userId int) (string, error) {
+	claims := jwt.MapClaims{
+		"authorized": true,
+		"userId":     userId,
+		"exp":        time.Now().Add(time.Hour * 1).Unix(), // Token expires after 1 hour
+	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(config.JWT_SECRET))
-
 }
 
-// extract token jwt
-func ExtractTokenUserId(e echo.Context) uint {
+func (m *middlewares) ExtractTokenUserId(e echo.Context) int {
 	header := e.Request().Header.Get("Authorization")
 	headerToken := strings.Split(header, " ")
-	token := headerToken[len(headerToken)-1]
-	tokenJWT, _ := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+	if len(headerToken) != 2 {
+		return 0
+	}
+	token := headerToken[1]
+	tokenJWT, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		return []byte(config.JWT_SECRET), nil
 	})
 
-	if tokenJWT.Valid {
-		claims := tokenJWT.Claims.(jwt.MapClaims)
-		userId, isValidUserId := claims["userId"].(float64)
-		if !isValidUserId {
-			return 0
-		}
-		return uint(userId)
+	if err != nil || !tokenJWT.Valid {
+		return 0
 	}
-	return 0
+
+	claims := tokenJWT.Claims.(jwt.MapClaims)
+	userId, isValidUserId := claims["userId"].(float64)
+	if !isValidUserId {
+		return 0
+	}
+	return int(userId)
 }

@@ -3,9 +3,9 @@ package handler
 import model "NEWSAPP/features/Comments/dataComments"
 
 type CommentResponse struct {
-	ID      uint   `json:"id"`
-	ArticlesID uint `json: "articles_id"`
-	Content string `json:"content"`
+	ID         uint   `json:"id"`
+	ArticlesID uint   `json:"articles_id"`
+	Content    string `json:"content"`
 }
 
 func NewCommentResponse(comments []*model.Comments) []CommentResponse {
@@ -13,9 +13,9 @@ func NewCommentResponse(comments []*model.Comments) []CommentResponse {
 
 	for _, comment := range comments {
 		response := CommentResponse{
-			ID:      comment.ID,
+			ID:         comment.ID,
 			ArticlesID: comment.ArticlesID,
-			Content: comment.Content,
+			Content:    comment.Content,
 		}
 		responses = append(responses, response)
 	}

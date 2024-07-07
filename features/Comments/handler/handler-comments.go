@@ -22,7 +22,7 @@ func NewCommentHandler(cs comments.ServiceCommentInterface) *CommentHandler {
 }
 
 func (ch *CommentHandler) CreateComment(c echo.Context) error {
-	userID := middlewares.ExtractTokenUserId(c)
+	userID := middlewares.NewMiddlewares().ExtractTokenUserId(c)
 	if userID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse(http.StatusUnauthorized, "error", "Unauthorized", nil))
 	}
@@ -32,11 +32,11 @@ func (ch *CommentHandler) CreateComment(c echo.Context) error {
 	if err := c.Bind(&newComment); err != nil {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(http.StatusBadRequest, "error", "Error binding data: "+err.Error(), nil))
 	}
-	
+
 	// Mapping request ke struct Comment
 	dataComments := comments.Comment{
-		ArticlesID:    newComment.ArticlesID,
-		Content:       newComment.Content,
+		ArticlesID: newComment.ArticlesID,
+		Content:    newComment.Content,
 	}
 
 	if err := ch.commentService.CreateNewComment(uint(userID), dataComments); err != nil {
@@ -57,9 +57,9 @@ func (ch *CommentHandler) ShowAllComments(c echo.Context) error {
 
 	for _, comment := range commentsList {
 		commentResponse := CommentResponse{
-			ID:      comment.CommentID,
+			ID:         comment.CommentID,
 			ArticlesID: comment.ArticlesID,
-			Content: comment.Content,
+			Content:    comment.Content,
 		}
 		commentsResponse = append(commentsResponse, commentResponse)
 	}
@@ -81,10 +81,8 @@ func (ch *CommentHandler) ShowCommentByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.JSONWebResponse(http.StatusOK, "Success", "Comment fetched successfully", comment))
 }
 
-
-
 func (ch *CommentHandler) UpdateComment(c echo.Context) error {
-	userID := middlewares.ExtractTokenUserId(c)
+	userID := middlewares.NewMiddlewares().ExtractTokenUserId(c)
 	if userID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse(http.StatusUnauthorized, "error", "Unauthorized", nil))
 	}
@@ -109,7 +107,7 @@ func (ch *CommentHandler) UpdateComment(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.JSONWebResponse(http.StatusOK, "Success", "Comment updated successfully", nil))
 }
 func (ch *CommentHandler) DeleteComment(c echo.Context) error {
-	userID := middlewares.ExtractTokenUserId(c)
+	userID := middlewares.NewMiddlewares().ExtractTokenUserId(c)
 	if userID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse(http.StatusUnauthorized, "error", "Unauthorized", nil))
 	}

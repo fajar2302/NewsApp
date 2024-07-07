@@ -66,7 +66,7 @@ func (uh *UserHandler) Login(c echo.Context) error {
 }
 
 func (uh *UserHandler) Update(c echo.Context) error {
-	userID := middlewares.ExtractTokenUserId(c)
+	userID := middlewares.NewMiddlewares().ExtractTokenUserId(c)
 	if userID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse(http.StatusUnauthorized, "error", "Unauthorized", nil))
 	}
@@ -95,7 +95,7 @@ func (uh *UserHandler) Update(c echo.Context) error {
 }
 
 func (uh *UserHandler) Delete(c echo.Context) error {
-	userID := middlewares.ExtractTokenUserId(c)
+	userID := middlewares.NewMiddlewares().ExtractTokenUserId(c)
 	if userID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse(http.StatusUnauthorized, "error", "Unauthorized", nil))
 	}
@@ -108,7 +108,7 @@ func (uh *UserHandler) Delete(c echo.Context) error {
 }
 
 func (uh *UserHandler) GetProfile(c echo.Context) error {
-	userID := middlewares.ExtractTokenUserId(c)
+	userID := middlewares.NewMiddlewares().ExtractTokenUserId(c)
 	if userID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse(http.StatusUnauthorized, "error", "Unauthorized", nil))
 	}

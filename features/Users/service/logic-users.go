@@ -33,7 +33,7 @@ func (u *userService) LoginAccount(email string, password string) (data *users.U
 		return nil, "", errors.New("[validation] email atau password tidak sesuai")
 	}
 
-	token, errJWT := middlewares.CreateToken(int(data.UserID))
+	token, errJWT := middlewares.NewMiddlewares().CreateToken(int(data.UserID))
 	if errJWT != nil {
 		return nil, "", errJWT
 	}
