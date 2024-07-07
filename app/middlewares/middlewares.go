@@ -29,7 +29,7 @@ func CreateToken(userId int) (string, error) {
 }
 
 // extract token jwt
-func ExtractTokenUserId(e echo.Context) int {
+func ExtractTokenUserId(e echo.Context) uint {
 	header := e.Request().Header.Get("Authorization")
 	headerToken := strings.Split(header, " ")
 	token := headerToken[len(headerToken)-1]
@@ -43,7 +43,7 @@ func ExtractTokenUserId(e echo.Context) int {
 		if !isValidUserId {
 			return 0
 		}
-		return int(userId)
+		return uint(userId)
 	}
 	return 0
 }
