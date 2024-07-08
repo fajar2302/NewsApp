@@ -1,9 +1,14 @@
 # NewsApp
-# documentasion :
+# Run The Program
+- Open Terminal bash
+- Masukan Perintah source.env
+- Masukan perintah go run main.go
+- mejalankan testing api di postman/insomnia dengan localhost : 8080 
+
+# Documentasion :
 https://app.swaggerhub.com/apis/RIANDARMAWAN785/BE23-NEWSAPP/1.0.0
 
-# import packages :
-- go get github.com/joho/godotenv
+# Import Packages :
 - go get gorm.io/driver/postgres
 - go get gorm.io/gorm
 - go get github.com/golang-jwt/jwt/v5
