@@ -9,16 +9,12 @@ type Comment struct {
 
 type DataCommentInterface interface {
 	CreateComment(comment Comment) error
-	GetCommentByID(commentID uint) (*Comment, error)
-	UpdateComment(commentID uint, newComment Comment) error
 	DeleteComment(commentID uint) error
 	GetAllComments() ([]*Comment, error)
 }
 
 type ServiceCommentInterface interface {
 	CreateNewComment(userId uint, comment Comment) error
-	GetCommentDetails(commentID uint) (*Comment, error)
-	UpdateCommentDetails(commentID uint, updatedComment Comment) error
 	DeleteComment(commentID uint) error
 	GetAllComments() ([]*Comment, error)
 }

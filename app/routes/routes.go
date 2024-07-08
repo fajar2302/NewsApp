@@ -38,10 +38,9 @@ func InitRouter(e *echo.Echo, db *gorm.DB) {
 	e.DELETE("/users", userHandlerAPI.Delete, middlewares.NewMiddlewares().JWTMiddleware())
 
 	// commentHandler
-	e.POST("/commets", commentHandlerAPI.CreateComment, middlewares.NewMiddlewares().JWTMiddleware())
-	e.GET("/commets", commentHandlerAPI.ShowAllComments)
-	e.PUT("/commets/:id", commentHandlerAPI.UpdateComment, middlewares.NewMiddlewares().JWTMiddleware())
-	e.DELETE("/commets/:id", commentHandlerAPI.DeleteComment, middlewares.NewMiddlewares().JWTMiddleware())
+	e.POST("/comments", commentHandlerAPI.CreateComment, middlewares.NewMiddlewares().JWTMiddleware())
+	e.GET("/comments", commentHandlerAPI.ShowAllComments)
+	e.DELETE("/comments/:id", commentHandlerAPI.DeleteComment, middlewares.NewMiddlewares().JWTMiddleware())
 
 	//articlesHandler
 	e.POST("/articles", articlesHandlerAPI.CreateArtikel, middlewares.NewMiddlewares().JWTMiddleware())
