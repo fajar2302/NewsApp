@@ -29,10 +29,11 @@ func (a *artikelQuery) Delete(id uint) error {
 // Insert implements articles.DataArtikelInterface.
 func (a *artikelQuery) Insert(artikel articles.Artikel) error {
 	artikelGorm := Articles{
-		UserID:      artikel.UserID,
-		ArtikelName: artikel.ArtikelName,
-		Tag:         artikel.Tag,
-		Description: artikel.Description,
+		UserID:         artikel.UserID,
+		ArtikelPicture: artikel.ArtikelPicture,
+		ArtikelName:    artikel.ArtikelName,
+		Tag:            artikel.Tag,
+		Description:    artikel.Description,
 	}
 	tx := a.db.Create(&artikelGorm)
 
@@ -74,10 +75,11 @@ func (a *artikelQuery) GetAll() ([]articles.Artikel, error) {
 	var allArtikelCore []articles.Artikel
 	for _, v := range allArtikel {
 		allArtikelCore = append(allArtikelCore, articles.Artikel{
-			UserID:      v.UserID,
-			ArtikelName: v.ArtikelName,
-			Tag:         v.Tag,
-			Description: v.Description,
+			UserID:         v.UserID,
+			ArtikelPicture: v.ArtikelPicture,
+			ArtikelName:    v.ArtikelName,
+			Tag:            v.Tag,
+			Description:    v.Description,
 		})
 	}
 
@@ -91,7 +93,7 @@ func (a *artikelQuery) Update(id uint, artikel articles.Artikel) error {
 	if tx.Error != nil {
 		return tx.Error
 	}
-
+	artikelGorm.ArtikelPicture = artikel.ArtikelPicture
 	artikelGorm.ArtikelName = artikel.ArtikelName
 	artikelGorm.Tag = artikel.Tag
 	artikelGorm.Description = artikel.Description

@@ -8,9 +8,10 @@ import (
 
 type Articles struct {
 	gorm.Model
-	UserID      uint
-	ArtikelName string
-	Tag         string
-	Description string
-	Comments    []datacomments.Comments `gorm:"foreignKey:ArticlesID"`
+	UserID         uint
+	ArtikelPicture string
+	ArtikelName    string
+	Tag            string
+	Description    string
+	Comments       []datacomments.Comments `gorm:"foreignKey:ArticlesID"`
 }

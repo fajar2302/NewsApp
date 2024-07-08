@@ -9,11 +9,12 @@ import (
 
 type Users struct {
 	gorm.Model
-	FullName    string
-	Email       string `gorm:"unique"`
-	Password    string
-	PhoneNumber string
-	Address     string
-	Articles    []dataarticles.Articles `gorm:"foreignKey:UserID"`
-	Comments    []datacomments.Comments `gorm:"foreignKey:UserID"`
+	ProfilePicture string
+	FullName       string
+	Email          string `gorm:"unique"`
+	Password       string
+	PhoneNumber    string
+	Address        string
+	Articles       []dataarticles.Articles `gorm:"foreignKey:UserID"`
+	Comments       []datacomments.Comments `gorm:"foreignKey:UserID"`
 }

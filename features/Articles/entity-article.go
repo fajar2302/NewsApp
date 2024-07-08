@@ -1,11 +1,12 @@
 package articles
 
 type Artikel struct {
-	ArtikelID   uint
-	UserID      uint
-	ArtikelName string
-	Tag         string
-	Description string
+	ArtikelID      uint
+	UserID         uint
+	ArtikelPicture string
+	ArtikelName    string
+	Tag            string
+	Description    string
 }
 
 type DataArtikelInterface interface {

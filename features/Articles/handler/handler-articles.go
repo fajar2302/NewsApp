@@ -35,16 +35,35 @@ func (ah *ArtikelHandler) CreateArtikel(c echo.Context) error {
 	if errBind != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"status":  "failed",
-			"message": "error bind todo: " + errBind.Error(),
+			"message": "error bind artikel: " + errBind.Error(),
 		})
+	}
+
+	// Membaca file gambar pengguna (jika ada)
+	file, err := c.FormFile("articles_picture")
+	var imageURL string
+	if err == nil {
+		// Buka file
+		src, err := file.Open()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(http.StatusInternalServerError, "error", "Gagal membuka file gambar: "+err.Error(), nil))
+		}
+		defer src.Close()
+
+		// Upload file ke Cloudinary
+		imageURL, err = newArtikel.uploadToCloudinary(src, file.Filename)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(http.StatusInternalServerError, "error", "Gagal mengunggah gambar: "+err.Error(), nil))
+		}
 	}
 
 	// mapping  dari request ke project
 	inputArtikel := articles.Artikel{
-		UserID:      uint(userID),
-		ArtikelName: newArtikel.ArtikelName,
-		Tag:         newArtikel.Tag,
-		Description: newArtikel.Description,
+		UserID:         uint(userID),
+		ArtikelPicture: imageURL,
+		ArtikelName:    newArtikel.ArtikelName,
+		Tag:            newArtikel.Tag,
+		Description:    newArtikel.Description,
 	}
 
 	if errInsert := ah.artikelService.Create(inputArtikel); errInsert != nil {
@@ -68,10 +87,11 @@ func (ah *ArtikelHandler) GetAllArtikel(c echo.Context) error {
 	var allArtikelResponse []ArtikelResponse
 	for _, value := range result {
 		allArtikelResponse = append(allArtikelResponse, ArtikelResponse{
-			UserID:      value.UserID,
-			ArtikelName: value.ArtikelName,
-			Tag:         value.Tag,
-			Description: value.Description,
+			UserID:         value.UserID,
+			ArtikelPicture: value.ArtikelPicture,
+			ArtikelName:    value.ArtikelName,
+			Tag:            value.Tag,
+			Description:    value.Description,
 		})
 	}
 
@@ -130,10 +150,29 @@ func (ah *ArtikelHandler) UpdateArtikel(c echo.Context) error {
 		})
 	}
 
+	// Membaca file gambar pengguna (jika ada)
+	file, err := c.FormFile("articles_picture")
+	var imageURL string
+	if err == nil {
+		// Buka file
+		src, err := file.Open()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(http.StatusInternalServerError, "error", "Gagal membuka file gambar: "+err.Error(), nil))
+		}
+		defer src.Close()
+
+		// Upload file ke Cloudinary
+		imageURL, err = updateData.uploadToCloudinary(src, file.Filename)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(http.StatusInternalServerError, "error", "Gagal mengunggah gambar: "+err.Error(), nil))
+		}
+	}
+
 	inputArtikel := articles.Artikel{
-		ArtikelName: updateData.ArtikelName,
-		Tag:         updateData.Tag,
-		Description: updateData.Description,
+		ArtikelPicture: imageURL,
+		ArtikelName:    updateData.ArtikelName,
+		Tag:            updateData.Tag,
+		Description:    updateData.Description,
 	}
 
 	if errInsert := ah.artikelService.Update(uint(idConv), uint(userID), inputArtikel); errInsert != nil {

@@ -1,8 +1,9 @@
 package handler
 
 type UserResponse struct {
-	FullName    string `json:"fullname"`
-	Email       string `json:"email"`
-	PhoneNumber string `json:"phone_number"`
-	Address     string `json:"address"`
+	ProfilePicture string `json:"profile_picture"`
+	FullName       string `json:"fullname"`
+	Email          string `json:"email"`
+	PhoneNumber    string `json:"phone_number"`
+	Address        string `json:"address"`
 }

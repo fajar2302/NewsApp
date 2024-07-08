@@ -27,13 +27,32 @@ func (uh *UserHandler) Register(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(http.StatusBadRequest, "error", "Error binding data: "+errBind.Error(), nil))
 	}
 
+	// Membaca file gambar pengguna (jika ada)
+	file, err := c.FormFile("profile_picture")
+	var imageURL string
+	if err == nil {
+		// Buka file
+		src, err := file.Open()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(http.StatusInternalServerError, "error", "Gagal membuka file gambar: "+err.Error(), nil))
+		}
+		defer src.Close()
+
+		// Upload file ke Cloudinary
+		imageURL, err = newUser.uploadToCloudinary(src, file.Filename)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(http.StatusInternalServerError, "error", "Gagal mengunggah gambar: "+err.Error(), nil))
+		}
+	}
+
 	// Mapping request ke struct User
 	dataUser := users.User{
-		FullName:    newUser.FullName,
-		Email:       newUser.Email,
-		Password:    newUser.Password,
-		PhoneNumber: newUser.PhoneNumber,
-		Address:     newUser.Address,
+		ProfilePicture: imageURL,
+		FullName:       newUser.FullName,
+		Email:          newUser.Email,
+		Password:       newUser.Password,
+		PhoneNumber:    newUser.PhoneNumber,
+		Address:        newUser.Address,
 	}
 
 	// Memanggil service layer untuk menyimpan data
@@ -76,12 +95,31 @@ func (uh *UserHandler) Update(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(http.StatusBadRequest, "error", "Error binding data: "+errBind.Error(), nil))
 	}
 
+	// Membaca file gambar pengguna (jika ada)
+	file, err := c.FormFile("profile_picture")
+	var imageURL string
+	if err == nil {
+		// Buka file
+		src, err := file.Open()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(http.StatusInternalServerError, "error", "Gagal membuka file gambar: "+err.Error(), nil))
+		}
+		defer src.Close()
+
+		// Upload file ke Cloudinary
+		imageURL, err = newUser.uploadToCloudinary(src, file.Filename)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(http.StatusInternalServerError, "error", "Gagal mengunggah gambar: "+err.Error(), nil))
+		}
+	}
+
 	dataUser := users.User{
-		FullName:    newUser.FullName,
-		Email:       newUser.Email,
-		Password:    newUser.Password,
-		PhoneNumber: newUser.PhoneNumber,
-		Address:     newUser.Address,
+		ProfilePicture: imageURL,
+		FullName:       newUser.FullName,
+		Email:          newUser.Email,
+		Password:       newUser.Password,
+		PhoneNumber:    newUser.PhoneNumber,
+		Address:        newUser.Address,
 	}
 
 	if errInsert := uh.userService.UpdateProfile(uint(userID), dataUser); errInsert != nil {
@@ -119,10 +157,11 @@ func (uh *UserHandler) GetProfile(c echo.Context) error {
 	}
 
 	userResponse := UserResponse{
-		FullName:    profile.FullName,
-		Email:       profile.Email,
-		PhoneNumber: profile.PhoneNumber,
-		Address:     profile.Address,
+		ProfilePicture: profile.ProfilePicture,
+		FullName:       profile.FullName,
+		Email:          profile.Email,
+		PhoneNumber:    profile.PhoneNumber,
+		Address:        profile.Address,
 	}
 
 	return c.JSON(http.StatusOK, responses.JSONWebResponse(http.StatusOK, "success", "Get user profile successful", echo.Map{"data": userResponse}))

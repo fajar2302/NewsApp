@@ -1,12 +1,13 @@
 package users
 
 type User struct {
-	UserID      uint
-	FullName    string
-	Email       string
-	Password    string
-	PhoneNumber string
-	Address     string
+	UserID         uint
+	ProfilePicture string
+	FullName       string
+	Email          string
+	Password       string
+	PhoneNumber    string
+	Address        string
 }
 
 type DataUserInterface interface {

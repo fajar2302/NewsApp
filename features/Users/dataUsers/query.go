@@ -19,11 +19,12 @@ func New(db *gorm.DB) users.DataUserInterface {
 // CreateAccount implements users.DataUserInterface.
 func (u *userQuery) CreateAccount(account users.User) error {
 	userGorm := Users{
-		FullName:    account.FullName,
-		Email:       account.Email,
-		Password:    account.Password,
-		PhoneNumber: account.PhoneNumber,
-		Address:     account.Address,
+		ProfilePicture: account.ProfilePicture,
+		FullName:       account.FullName,
+		Email:          account.Email,
+		Password:       account.Password,
+		PhoneNumber:    account.PhoneNumber,
+		Address:        account.Address,
 	}
 	tx := u.db.Create(&userGorm)
 
@@ -62,10 +63,11 @@ func (u *userQuery) AccountById(userid uint) (*users.User, error) {
 	}
 	// mapping
 	var user = users.User{
-		FullName:    userData.FullName,
-		Email:       userData.Email,
-		PhoneNumber: userData.PhoneNumber,
-		Address:     userData.Address,
+		ProfilePicture: userData.ProfilePicture,
+		FullName:       userData.FullName,
+		Email:          userData.Email,
+		PhoneNumber:    userData.PhoneNumber,
+		Address:        userData.Address,
 	}
 
 	return &user, nil
@@ -77,7 +79,7 @@ func (u *userQuery) UpdateAccount(userid uint, account users.User) error {
 	if tx.Error != nil {
 		return tx.Error
 	}
-
+	userGorm.ProfilePicture = account.ProfilePicture
 	userGorm.FullName = account.FullName
 	userGorm.Email = account.Email
 	userGorm.Password = account.Password
