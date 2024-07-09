@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	JWT_SECRET string
+	JWT_SECRET     string
+	CLOUDINARY_URL string
 )
 
 type AppConfig struct {
@@ -29,6 +30,7 @@ func ReadEnv() *AppConfig {
 	app.PORT = portConv
 	app.DBNAME = os.Getenv("DBNAME")
 	JWT_SECRET = os.Getenv("JWTSECRET")
+	CLOUDINARY_URL = os.Getenv("CLOUDINARY_URL")
 	return &app
 }
 

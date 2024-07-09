@@ -14,7 +14,8 @@ import (
 func TestRegister(t *testing.T) {
 	mockUserData := new(mocks.DataUserInterface)
 	mockHashService := new(mocks.HashInterface)
-	userService := service.New(mockUserData, mockHashService)
+	mockMiddleware := new(mocks.MiddlewaresInterface)
+	userService := service.New(mockUserData, mockHashService, mockMiddleware)
 
 	t.Run("success", func(t *testing.T) {
 		user := users.User{
@@ -66,26 +67,27 @@ func TestRegister(t *testing.T) {
 func TestLogin(t *testing.T) {
 	mockUserData := new(mocks.DataUserInterface)
 	mockHashService := new(mocks.HashInterface)
-	userService := service.New(mockUserData, mockHashService)
+	mockMiddleware := new(mocks.MiddlewaresInterface)
+	userService := service.New(mockUserData, mockHashService, mockMiddleware)
 
 	t.Run("success", func(t *testing.T) {
 		email := "johndoe@example.com"
 		password := "password123"
 		hashedPassword := "hashedpassword"
 		user := &users.User{
+			UserID:      1,
 			FullName:    "John Doe",
 			Email:       email,
 			Password:    hashedPassword,
 			PhoneNumber: "08123456789",
 			Address:     "Some Address",
 		}
+
 		token := "sometoken"
 
 		mockUserData.On("AccountByEmail", email).Return(user, nil).Once()
 		mockHashService.On("CheckPasswordHash", hashedPassword, password).Return(true).Once()
-
-		// Assuming that token generation is done within LoginAccount
-		mockUserData.On("GenerateToken", user.UserID).Return(token, nil).Once()
+		mockMiddleware.On("CreateToken", 1).Return("sometoken", nil).Once()
 
 		returnedUser, returnedToken, err := userService.LoginAccount(email, password)
 
@@ -94,6 +96,7 @@ func TestLogin(t *testing.T) {
 		assert.Equal(t, token, returnedToken)
 		mockUserData.AssertExpectations(t)
 		mockHashService.AssertExpectations(t)
+		mockMiddleware.AssertExpectations(t)
 	})
 
 	t.Run("account not found", func(t *testing.T) {
@@ -129,7 +132,7 @@ func TestLogin(t *testing.T) {
 		returnedUser, returnedToken, err := userService.LoginAccount(email, password)
 
 		assert.Error(t, err)
-		assert.Equal(t, "password verification error", err.Error())
+		assert.Equal(t, "[validation] email atau password tidak sesuai", err.Error())
 		assert.Nil(t, returnedUser)
 		assert.Empty(t, returnedToken)
 		mockUserData.AssertExpectations(t)
@@ -140,7 +143,8 @@ func TestLogin(t *testing.T) {
 func TestUpdateProfile(t *testing.T) {
 	mockUserData := new(mocks.DataUserInterface)
 	mockHashService := new(mocks.HashInterface)
-	userService := service.New(mockUserData, mockHashService)
+	mockMiddleware := new(mocks.MiddlewaresInterface)
+	userService := service.New(mockUserData, mockHashService, mockMiddleware)
 
 	t.Run("success", func(t *testing.T) {
 		userID := uint(1)
@@ -166,26 +170,66 @@ func TestUpdateProfile(t *testing.T) {
 	t.Run("update error", func(t *testing.T) {
 		userID := uint(1)
 		user := users.User{
-			FullName:    "John Doe",
-			Email:       "johndoe@example.com",
-			PhoneNumber: "08123456789",
-			Address:     "Some Address",
+			ProfilePicture: "picture.png",
+			FullName:       "John Doe",
+			Email:          "johndoe@example.com",
+			Password:       "password",
+			PhoneNumber:    "08123456789",
+			Address:        "Some Address",
 		}
 
-		mockUserData.On("UpdateAccount", userID, user).Return(errors.New("update error")).Once()
+		mockHashService.On("HashPassword", mock.Anything).Return("password", nil).Once()
+		mockUserData.On("UpdateAccount", userID, user).Return(errors.New("update failed")).Once()
 
 		err := userService.UpdateProfile(userID, user)
 
 		assert.Error(t, err)
-		assert.Equal(t, "update error", err.Error())
+		assert.Equal(t, "update failed", err.Error())
 		mockUserData.AssertExpectations(t)
+		mockHashService.AssertExpectations(t)
+	})
+
+	t.Run("validation error", func(t *testing.T) {
+		userID := uint(1)
+		user := users.User{}
+
+		err := userService.UpdateProfile(userID, user)
+
+		assert.Error(t, err)
+		assert.Equal(t, "[validation] nama/email/password/phone/address tidak boleh kosong", err.Error())
+
+		// Ensure that no methods were called on mocks since validation should prevent further processing
+		mockUserData.AssertNotCalled(t, "HashPassword")
+		mockUserData.AssertNotCalled(t, "UpdateAccount")
+		mockHashService.AssertNotCalled(t, "HashPassword")
+	})
+
+	t.Run("hash error", func(t *testing.T) {
+		userID := uint(1)
+		user := users.User{
+			ProfilePicture: "picture.png",
+			FullName:       "John Doe",
+			Email:          "johndoe@example.com",
+			Password:       "password",
+			PhoneNumber:    "08123456789",
+			Address:        "Some Address",
+		}
+
+		mockHashService.On("HashPassword", mock.Anything).Return("", errors.New("hash error")).Once()
+
+		err := userService.UpdateProfile(userID, user)
+
+		assert.Error(t, err)
+		assert.Equal(t, "hash error", err.Error())
+		mockHashService.AssertExpectations(t)
 	})
 }
 
 func TestDeleteProfile(t *testing.T) {
 	mockUserData := new(mocks.DataUserInterface)
 	mockHashService := new(mocks.HashInterface)
-	userService := service.New(mockUserData, mockHashService)
+	mockMiddleware := new(mocks.MiddlewaresInterface)
+	userService := service.New(mockUserData, mockHashService, mockMiddleware)
 
 	t.Run("success", func(t *testing.T) {
 		userID := uint(1)
@@ -214,7 +258,8 @@ func TestDeleteProfile(t *testing.T) {
 func TestGetProfile(t *testing.T) {
 	mockUserData := new(mocks.DataUserInterface)
 	mockHashService := new(mocks.HashInterface)
-	userService := service.New(mockUserData, mockHashService)
+	mockMiddleware := new(mocks.MiddlewaresInterface)
+	userService := service.New(mockUserData, mockHashService, mockMiddleware)
 
 	t.Run("success", func(t *testing.T) {
 		userID := uint(1)

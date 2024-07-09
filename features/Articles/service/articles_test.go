@@ -165,7 +165,7 @@ func TestUpdateArticle(t *testing.T) {
 			ArtikelPicture: "updated.png",
 			ArtikelName:    "Updated Article",
 			Tag:            "technology",
-			Description:    "This is the updated content of the article",
+			Description:    "user id not match, cannot update artikel",
 		}
 
 		err := articleService.Update(articleID, userID, article)
@@ -216,7 +216,7 @@ func TestDeleteArticle(t *testing.T) {
 		err := articleService.Delete(articleID, userID)
 
 		assert.Error(t, err)
-		assert.Equal(t, "user id not match, cannot delete artikel", err.Error())
+		assert.Equal(t, "user id not match, cannot delete articles", err.Error())
 		mockArticleData.AssertExpectations(t)
 	})
 

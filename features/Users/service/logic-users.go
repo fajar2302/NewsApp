@@ -8,14 +8,16 @@ import (
 )
 
 type userService struct {
-	userData    users.DataUserInterface
-	hashService encrypts.HashInterface
+	userData          users.DataUserInterface
+	hashService       encrypts.HashInterface
+	middlewareservice middlewares.MiddlewaresInterface
 }
 
-func New(ud users.DataUserInterface, hash encrypts.HashInterface) users.ServiceUserInterface {
+func New(ud users.DataUserInterface, hash encrypts.HashInterface, mi middlewares.MiddlewaresInterface) users.ServiceUserInterface {
 	return &userService{
-		userData:    ud,
-		hashService: hash,
+		userData:          ud,
+		hashService:       hash,
+		middlewareservice: mi,
 	}
 
 }
@@ -33,7 +35,7 @@ func (u *userService) LoginAccount(email string, password string) (data *users.U
 		return nil, "", errors.New("[validation] email atau password tidak sesuai")
 	}
 
-	token, errJWT := middlewares.NewMiddlewares().CreateToken(int(data.UserID))
+	token, errJWT := u.middlewareservice.CreateToken(int(data.UserID))
 	if errJWT != nil {
 		return nil, "", errJWT
 	}
