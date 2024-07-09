@@ -16,40 +16,35 @@ func TestCreateComments(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		comment := comments.Comment{
-			UserID:     1,
 			ArticlesID: 1,
-			Content:    "Great article!",
+			Content:    "Test comment",
 		}
 
 		mockCommentData.On("CreateComment", comment).Return(nil).Once()
 
-		err := commentService.CreateNewComment(1, comment)
+		err := commentService.CreateNewComment(comment.ArticlesID, comment)
 		assert.NoError(t, err)
 		mockCommentData.AssertExpectations(t)
 	})
 
 	t.Run("error validation", func(t *testing.T) {
-		comment := comments.Comment{
-			ArticlesID: 1,
-			Content:    "Great article!",
-		}
+		comment := comments.Comment{} // Empty comment intentionally
 
 		err := commentService.CreateNewComment(0, comment)
 		assert.Error(t, err)
-		assert.Equal(t, "[validation] UserID, ArticlesID, dan Content tidak boleh kosong", err.Error())
-		mockCommentData.AssertExpectations(t)
+		assert.Equal(t, "[validation] ArticlesID, and Content cannot be empty", err.Error())
+		mockCommentData.AssertNotCalled(t, "CreateComment") // Ensure CreateComment was not called
 	})
 
 	t.Run("error create", func(t *testing.T) {
 		comment := comments.Comment{
-			UserID:     1,
 			ArticlesID: 1,
-			Content:    "Great article!",
+			Content:    "Test comment",
 		}
 
 		mockCommentData.On("CreateComment", comment).Return(errors.New("create error")).Once()
 
-		err := commentService.CreateNewComment(1, comment)
+		err := commentService.CreateNewComment(comment.ArticlesID, comment)
 		assert.Error(t, err)
 		assert.Equal(t, "create error", err.Error())
 		mockCommentData.AssertExpectations(t)
@@ -87,34 +82,26 @@ func TestGetAllComments(t *testing.T) {
 	commentService := service.New(mockCommentData)
 
 	t.Run("success", func(t *testing.T) {
-		expectedComments := []*comments.Comment{
-			{
-				CommentID:  1,
-				ArticlesID: 1,
-				Content:    "Great article!",
-			},
-			{
-				CommentID:  2,
-				ArticlesID: 2,
-				Content:    "Nice post!",
-			},
+		expectedComments := []comments.Comment{
+			{UserID: 1, ArticlesID: 1, Content: "Comment 1"},
+			{UserID: 2, ArticlesID: 1, Content: "Comment 2"},
 		}
 
 		mockCommentData.On("GetAllComments").Return(expectedComments, nil).Once()
 
-		returnedComments, err := commentService.GetAllComments()
+		commentsList, err := commentService.GetAllComments()
 		assert.NoError(t, err)
-		assert.Equal(t, expectedComments, returnedComments)
+		assert.Equal(t, expectedComments, commentsList)
 		mockCommentData.AssertExpectations(t)
 	})
 
 	t.Run("error", func(t *testing.T) {
-		mockCommentData.On("GetAllComments").Return(nil, errors.New("get all error")).Once()
+		mockCommentData.On("GetAllComments").Return(nil, errors.New("get error")).Once()
 
-		returnedComments, err := commentService.GetAllComments()
+		commentsList, err := commentService.GetAllComments()
 		assert.Error(t, err)
-		assert.Equal(t, "get all error", err.Error())
-		assert.Nil(t, returnedComments)
+		assert.Nil(t, commentsList)
+		assert.Equal(t, "get error", err.Error())
 		mockCommentData.AssertExpectations(t)
 	})
 }

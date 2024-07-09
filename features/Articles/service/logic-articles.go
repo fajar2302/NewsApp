@@ -38,7 +38,7 @@ func (ar *artikelService) Delete(id uint, userid uint) error {
 	}
 
 	if cekuserid.UserID != userid {
-		return errors.New("user id not match, cannot delete todo")
+		return errors.New("user id not match, cannot delete articles")
 	}
 
 	return ar.artikelData.Delete(id)

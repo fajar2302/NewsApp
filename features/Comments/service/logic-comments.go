@@ -15,21 +15,23 @@ func New(cd comments.DataCommentInterface) comments.ServiceCommentInterface {
 	}
 }
 
-func (s *ServiceComment) CreateNewComment(userID uint, comment comments.Comment) error {
+func (s *ServiceComment) CreateNewComment(articlesid uint, comment comments.Comment) error {
 	// Validate required fields
-	if userID == 0 || comment.ArticlesID == 0 || comment.Content == "" {
-		return errors.New("[validation] UserID, ArticlesID, dan Content tidak boleh kosong")
+	if comment.ArticlesID == 0 || comment.Content == "" {
+		return errors.New("[validation] ArticlesID, and Content cannot be empty")
 	}
 
-	comment.UserID = userID
-
-	return s.commentData.CreateComment(comment)
+	err := s.commentData.CreateComment(comment)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *ServiceComment) DeleteComment(commentID uint) error {
 	return s.commentData.DeleteComment(commentID)
 }
-func (s *ServiceComment) GetAllComments() ([]*comments.Comment, error) {
+func (s *ServiceComment) GetAllComments() ([]comments.Comment, error) {
 	commentsList, err := s.commentData.GetAllComments()
 	if err != nil {
 		return nil, err

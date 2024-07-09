@@ -3,7 +3,7 @@ package handler
 import model "NEWSAPP/features/Comments/dataComments"
 
 type CommentResponse struct {
-	ID         uint   `json:"user_id"`
+	UserID     uint   `json:"user_id"`
 	ArticlesID uint   `json:"articles_id"`
 	Content    string `json:"content"`
 }
@@ -13,7 +13,7 @@ func NewCommentResponse(comments []*model.Comments) []CommentResponse {
 
 	for _, comment := range comments {
 		response := CommentResponse{
-			ID:         comment.ID,
+			UserID:     comment.UserID,
 			ArticlesID: comment.ArticlesID,
 			Content:    comment.Content,
 		}

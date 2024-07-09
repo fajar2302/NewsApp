@@ -13,9 +13,9 @@ type ServiceCommentInterface struct {
 	mock.Mock
 }
 
-// CreateNewComment provides a mock function with given fields: userId, comment
-func (_m *ServiceCommentInterface) CreateNewComment(userId uint, comment comments.Comment) error {
-	ret := _m.Called(userId, comment)
+// CreateNewComment provides a mock function with given fields: articlesid, comment
+func (_m *ServiceCommentInterface) CreateNewComment(articlesid uint, comment comments.Comment) error {
+	ret := _m.Called(articlesid, comment)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateNewComment")
@@ -23,7 +23,7 @@ func (_m *ServiceCommentInterface) CreateNewComment(userId uint, comment comment
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(uint, comments.Comment) error); ok {
-		r0 = rf(userId, comment)
+		r0 = rf(articlesid, comment)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -50,23 +50,23 @@ func (_m *ServiceCommentInterface) DeleteComment(commentID uint) error {
 }
 
 // GetAllComments provides a mock function with given fields:
-func (_m *ServiceCommentInterface) GetAllComments() ([]*comments.Comment, error) {
+func (_m *ServiceCommentInterface) GetAllComments() ([]comments.Comment, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAllComments")
 	}
 
-	var r0 []*comments.Comment
+	var r0 []comments.Comment
 	var r1 error
-	if rf, ok := ret.Get(0).(func() ([]*comments.Comment, error)); ok {
+	if rf, ok := ret.Get(0).(func() ([]comments.Comment, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() []*comments.Comment); ok {
+	if rf, ok := ret.Get(0).(func() []comments.Comment); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*comments.Comment)
+			r0 = ret.Get(0).([]comments.Comment)
 		}
 	}
 

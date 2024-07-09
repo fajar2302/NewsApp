@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -34,17 +33,18 @@ func (ch *CommentHandler) CreateComment(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(http.StatusBadRequest, "error", "Error binding data: "+err.Error(), nil))
 	}
 
-	// Mapping request ke struct Comment
-	dataComments := comments.Comment{
+	// Validate and create comment
+	comment := comments.Comment{
+		UserID:     uint(userID),
 		ArticlesID: newComment.ArticlesID,
 		Content:    newComment.Content,
 	}
 
-	if err := ch.commentService.CreateNewComment(uint(userID), dataComments); err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(http.StatusInternalServerError, "Failed", "Comment creation failed: "+err.Error(), nil))
+	if err := ch.commentService.CreateNewComment(uint(userID), comment); err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(http.StatusInternalServerError, "error", "Comment creation failed: "+err.Error(), nil))
 	}
-	log.Println("disini userid: ", userID)
-	return c.JSON(http.StatusCreated, responses.JSONWebResponse(http.StatusCreated, "Success", "Comment created successfully", nil))
+
+	return c.JSON(http.StatusCreated, responses.JSONWebResponse(http.StatusCreated, "success", "Comment created successfully", nil))
 }
 
 func (ch *CommentHandler) ShowAllComments(c echo.Context) error {
@@ -58,7 +58,7 @@ func (ch *CommentHandler) ShowAllComments(c echo.Context) error {
 
 	for _, comment := range commentsList {
 		commentResponse := CommentResponse{
-			ID:         comment.CommentID,
+			UserID:     comment.UserID,
 			ArticlesID: comment.ArticlesID,
 			Content:    comment.Content,
 		}

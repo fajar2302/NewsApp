@@ -29,7 +29,7 @@ func TestCreateArticles(t *testing.T) {
 		mockArticleData.AssertExpectations(t)
 	})
 
-	t.Run("failed", func(t *testing.T) {
+	t.Run("failed - empty artikel name", func(t *testing.T) {
 		article := articles.Artikel{
 			ArtikelName: "",
 		}
@@ -38,6 +38,22 @@ func TestCreateArticles(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, "artikel name cannot be empty", err.Error())
 	})
+
+	t.Run("failed - data insert error", func(t *testing.T) {
+		article := articles.Artikel{
+			ArtikelPicture: "articles.png",
+			ArtikelName:    "Learn Golang",
+			Tag:            "programming",
+			Description:    "Learn Golang basic functionality",
+		}
+
+		mockArticleData.On("Insert", article).Return(errors.New("insert error")).Once()
+
+		err := articleService.Create(article)
+		assert.Error(t, err)
+		assert.Equal(t, "insert error", err.Error())
+		mockArticleData.AssertExpectations(t)
+	})
 }
 
 func TestGetAll(t *testing.T) {
@@ -45,7 +61,7 @@ func TestGetAll(t *testing.T) {
 	articleService := service.New(mockArticleData)
 
 	t.Run("success", func(t *testing.T) {
-		articles := []articles.Artikel{
+		expectedArticles := []articles.Artikel{
 			{
 				UserID:         1,
 				ArtikelPicture: "articles.png",
@@ -62,16 +78,16 @@ func TestGetAll(t *testing.T) {
 			},
 		}
 
-		mockArticleData.On("GetAll").Return(articles, nil).Once()
+		mockArticleData.On("GetAll").Return(expectedArticles, nil).Once()
 
 		returnedArticles, err := articleService.GetAllArtikel()
 
 		assert.NoError(t, err)
-		assert.Equal(t, articles, returnedArticles)
+		assert.Equal(t, expectedArticles, returnedArticles)
 		mockArticleData.AssertExpectations(t)
 	})
 
-	t.Run("get all error", func(t *testing.T) {
+	t.Run("error - get all error", func(t *testing.T) {
 		mockArticleData.On("GetAll").Return(nil, errors.New("get all error")).Once()
 
 		returnedArticles, err := articleService.GetAllArtikel()
@@ -106,7 +122,7 @@ func TestUpdateArticle(t *testing.T) {
 		mockArticleData.AssertExpectations(t)
 	})
 
-	t.Run("update error", func(t *testing.T) {
+	t.Run("error - empty artikel name", func(t *testing.T) {
 		articleID := uint(1)
 		userID := uint(1)
 		article := articles.Artikel{
@@ -123,7 +139,7 @@ func TestUpdateArticle(t *testing.T) {
 		mockArticleData.AssertExpectations(t)
 	})
 
-	t.Run("user id not match", func(t *testing.T) {
+	t.Run("error - user id not match", func(t *testing.T) {
 		articleID := uint(1)
 		userID := uint(2) // different userID
 		article := articles.Artikel{
@@ -139,6 +155,23 @@ func TestUpdateArticle(t *testing.T) {
 
 		assert.Error(t, err)
 		assert.Equal(t, "user id not match, cannot update artikel", err.Error())
+		mockArticleData.AssertExpectations(t)
+	})
+
+	t.Run("error - invalid artikel ID", func(t *testing.T) {
+		articleID := uint(0) // invalid ID
+		userID := uint(1)
+		article := articles.Artikel{
+			ArtikelPicture: "updated.png",
+			ArtikelName:    "Updated Article",
+			Tag:            "technology",
+			Description:    "This is the updated content of the article",
+		}
+
+		err := articleService.Update(articleID, userID, article)
+
+		assert.Error(t, err)
+		assert.Equal(t, "invalid artikel ID", err.Error())
 		mockArticleData.AssertExpectations(t)
 	})
 }
@@ -160,7 +193,7 @@ func TestDeleteArticle(t *testing.T) {
 		mockArticleData.AssertExpectations(t)
 	})
 
-	t.Run("delete error", func(t *testing.T) {
+	t.Run("error - delete error", func(t *testing.T) {
 		articleID := uint(1)
 		userID := uint(1)
 
@@ -174,7 +207,7 @@ func TestDeleteArticle(t *testing.T) {
 		mockArticleData.AssertExpectations(t)
 	})
 
-	t.Run("user id not match", func(t *testing.T) {
+	t.Run("error - user id not match", func(t *testing.T) {
 		articleID := uint(1)
 		userID := uint(2) // different userID
 
@@ -184,6 +217,17 @@ func TestDeleteArticle(t *testing.T) {
 
 		assert.Error(t, err)
 		assert.Equal(t, "user id not match, cannot delete artikel", err.Error())
+		mockArticleData.AssertExpectations(t)
+	})
+
+	t.Run("error - invalid artikel ID", func(t *testing.T) {
+		articleID := uint(0) // invalid ID
+		userID := uint(1)
+
+		err := articleService.Delete(articleID, userID)
+
+		assert.Error(t, err)
+		assert.Equal(t, "invalid artikel ID", err.Error())
 		mockArticleData.AssertExpectations(t)
 	})
 }

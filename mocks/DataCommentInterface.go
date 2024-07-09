@@ -50,23 +50,23 @@ func (_m *DataCommentInterface) DeleteComment(commentID uint) error {
 }
 
 // GetAllComments provides a mock function with given fields:
-func (_m *DataCommentInterface) GetAllComments() ([]*comments.Comment, error) {
+func (_m *DataCommentInterface) GetAllComments() ([]comments.Comment, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAllComments")
 	}
 
-	var r0 []*comments.Comment
+	var r0 []comments.Comment
 	var r1 error
-	if rf, ok := ret.Get(0).(func() ([]*comments.Comment, error)); ok {
+	if rf, ok := ret.Get(0).(func() ([]comments.Comment, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() []*comments.Comment); ok {
+	if rf, ok := ret.Get(0).(func() []comments.Comment); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*comments.Comment)
+			r0 = ret.Get(0).([]comments.Comment)
 		}
 	}
 

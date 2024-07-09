@@ -57,7 +57,7 @@ func (ah *ArtikelHandler) CreateArtikel(c echo.Context) error {
 		}
 	}
 
-	// mapping  dari request ke project
+	// mapping  dari request ke articles
 	inputArtikel := articles.Artikel{
 		UserID:         uint(userID),
 		ArtikelPicture: imageURL,
