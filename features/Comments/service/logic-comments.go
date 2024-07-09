@@ -9,7 +9,6 @@ type ServiceComment struct {
 	commentData comments.DataCommentInterface
 }
 
-
 func New(cd comments.DataCommentInterface) comments.ServiceCommentInterface {
 	return &ServiceComment{
 		commentData: cd,
@@ -25,20 +24,6 @@ func (s *ServiceComment) CreateNewComment(userID uint, comment comments.Comment)
 	comment.UserID = userID
 
 	return s.commentData.CreateComment(comment)
-}
-func (s *ServiceComment) GetCommentDetails(commentID uint) (*comments.Comment, error) {
-	comment, err := s.commentData.GetCommentByID(commentID)
-	if err != nil {
-		return nil, err
-	}
-	return comment, nil
-}
-func (s *ServiceComment) UpdateCommentDetails(commentID uint, updatedComment comments.Comment) error {
-	if updatedComment.Content == "" {
-		return errors.New("[validation] Content tidak boleh kosong")
-	}
-
-	return s.commentData.UpdateComment(commentID, updatedComment)
 }
 
 func (s *ServiceComment) DeleteComment(commentID uint) error {

@@ -67,45 +67,6 @@ func (ch *CommentHandler) ShowAllComments(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.JSONWebResponse(http.StatusOK, "Success", "All comments fetched successfully", commentsResponse))
 }
 
-func (ch *CommentHandler) ShowCommentByID(c echo.Context) error {
-	// Mengambil commentID dari URL parameter dan mengonversi ke uint
-	commentID, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(http.StatusBadRequest, "Bad Request", "Invalid comment ID", nil))
-	}
-
-	comment, err := ch.commentService.GetCommentDetails(uint(commentID))
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(http.StatusInternalServerError, "Failed", "Failed to fetch comment: "+err.Error(), nil))
-	}
-	return c.JSON(http.StatusOK, responses.JSONWebResponse(http.StatusOK, "Success", "Comment fetched successfully", comment))
-}
-
-func (ch *CommentHandler) UpdateComment(c echo.Context) error {
-	userID := middlewares.NewMiddlewares().ExtractTokenUserId(c)
-	if userID == 0 {
-		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse(http.StatusUnauthorized, "error", "Unauthorized", nil))
-	}
-
-	commentIDStr := c.Param("id")
-	commentID, err := strconv.ParseUint(commentIDStr, 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(http.StatusBadRequest, "Bad Request", "Invalid comment ID", nil))
-	}
-
-	updatedComment := UpdateRequest{}
-	if err := c.Bind(&updatedComment); err != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(http.StatusBadRequest, "error", "Error binding data: "+err.Error(), nil))
-	}
-
-	if err := ch.commentService.UpdateCommentDetails(uint(commentID), comments.Comment{
-		Content: updatedComment.Content,
-	}); err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(http.StatusInternalServerError, "Failed", "Failed to update comment: "+err.Error(), nil))
-	}
-
-	return c.JSON(http.StatusOK, responses.JSONWebResponse(http.StatusOK, "Success", "Comment updated successfully", nil))
-}
 func (ch *CommentHandler) DeleteComment(c echo.Context) error {
 	userID := middlewares.NewMiddlewares().ExtractTokenUserId(c)
 	if userID == 0 {
