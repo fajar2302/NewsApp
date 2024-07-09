@@ -164,5 +164,5 @@ func (uh *UserHandler) GetProfile(c echo.Context) error {
 		Address:        profile.Address,
 	}
 
-	return c.JSON(http.StatusOK, responses.JSONWebResponse(http.StatusOK, "success", "Get user profile successful", echo.Map{"data": userResponse}))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse(http.StatusOK, "success", "Get user profile successful", userResponse))
 }

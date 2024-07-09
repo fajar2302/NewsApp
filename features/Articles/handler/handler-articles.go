@@ -95,10 +95,7 @@ func (ah *ArtikelHandler) GetAllArtikel(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]any{
-		"status":  "success",
-		"results": allArtikelResponse,
-	})
+	return c.JSON(http.StatusOK, responses.JSONWebResponse(http.StatusOK, "success", "All articles fetched successfully", allArtikelResponse))
 }
 
 func (ah *ArtikelHandler) DeleteArtikel(c echo.Context) error {
