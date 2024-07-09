@@ -12,7 +12,6 @@ type commentQuery struct {
 
 // GetAllComments implements comments.DataCommentInterface.
 
-
 func New(db *gorm.DB) comments.DataCommentInterface {
 	return &commentQuery{
 		db: db,

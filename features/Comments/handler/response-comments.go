@@ -3,7 +3,7 @@ package handler
 import model "NEWSAPP/features/Comments/dataComments"
 
 type CommentResponse struct {
-	ID         uint   `json:"id"`
+	ID         uint   `json:"user_id"`
 	ArticlesID uint   `json:"articles_id"`
 	Content    string `json:"content"`
 }

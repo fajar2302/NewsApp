@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -42,7 +43,7 @@ func (ch *CommentHandler) CreateComment(c echo.Context) error {
 	if err := ch.commentService.CreateNewComment(uint(userID), dataComments); err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(http.StatusInternalServerError, "Failed", "Comment creation failed: "+err.Error(), nil))
 	}
-
+	log.Println("disini userid: ", userID)
 	return c.JSON(http.StatusCreated, responses.JSONWebResponse(http.StatusCreated, "Success", "Comment created successfully", nil))
 }
 
